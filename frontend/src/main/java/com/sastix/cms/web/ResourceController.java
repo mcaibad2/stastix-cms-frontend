@@ -1,14 +1,9 @@
 package com.sastix.cms.web;
 
 import com.sastix.cms.client.impl.CmsClient;
-import com.sastix.cms.common.cache.CacheDTO;
-import com.sastix.cms.common.cache.QueryCacheDTO;
 import com.sastix.cms.common.content.CreateResourceDTO;
 import com.sastix.cms.common.content.ResourceDTO;
 import com.sastix.cms.common.content.ResourceQueryDTO;
-import com.sastix.cms.common.content.exceptions.ContentValidationException;
-import com.sastix.cms.common.content.exceptions.ResourceAccessError;
-import com.sastix.cms.common.content.exceptions.ResourceNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
