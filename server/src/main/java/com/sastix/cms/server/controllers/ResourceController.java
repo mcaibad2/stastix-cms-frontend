@@ -23,6 +23,7 @@ import com.sastix.cms.common.content.exceptions.ResourceAccessError;
 import com.sastix.cms.common.content.exceptions.ResourceNotFound;
 import com.sastix.cms.common.content.exceptions.ResourceNotOwned;
 import com.sastix.cms.server.CmsServer;
+import com.sastix.cms.server.domain.entities.Resource;
 import com.sastix.cms.server.domain.repositories.ResourceRepository;
 import com.sastix.cms.server.services.content.HashedDirectoryService;
 import com.sastix.cms.server.services.content.ResourceService;
@@ -130,6 +131,15 @@ public class ResourceController implements BeanFactoryAware {
         LOG.trace(Constants.QUERY_RESOURCE);
         validationHelper.validate(result);
         final ResourceDTO resourceDTO = resourceService.queryResource(resourceQueryDTO);
+        LOG.trace("{}", resourceDTO);
+        return resourceDTO;
+    }
+
+
+    @RequestMapping(value = "/v" + Constants.REST_API_1_0 + "/" + Constants.LIST_ALL_RESOURCES, method = RequestMethod.POST)
+    public ResourceDTO listAllResources(@Valid @RequestBody ResourceQueryDTO resourceQueryDTO, BindingResult result) throws ContentValidationException, ResourceNotFound, ResourceAccessError {
+        LOG.trace(Constants.LIST_ALL_RESOURCES);
+        final ResourceDTO resourceDTO = resourceService.listAllResources();
         LOG.trace("{}", resourceDTO);
         return resourceDTO;
     }

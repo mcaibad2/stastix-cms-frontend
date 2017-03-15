@@ -572,12 +572,30 @@ public class HazelcastResourceServiceImpl implements ResourceService {
         // Save revision
         Revision persistedRevision = new Revision();
         persistedRevision.setCreatedAt(new Date());
-        persistedRevision.setTitle(DateTime.now().toString()); //TODO: what kind of title should we store? It is not described in specs
+        persistedRevision.setTitle(DateTime.now().toString()); // TODO: What kind of title should we store? It is not described in specs
         persistedRevision.setResource(persistedResource);
         persistedRevision.setParentResource(parentResource);
         revisionRepository.save(persistedRevision);
 
         return persistedResource;
+    }
+
+    @Override
+    public ResourceDTO listAllResources() {
+        List<ResourceDTO> resourceDTOS = new ArrayList<>();
+        Iterable<Resource> resources = resourceRepository.findAll();
+        Iterator<Resource> iterator = resources.iterator();
+        while (iterator.hasNext()) {
+            Resource resource = iterator.next();
+            ResourceDTO item = new ResourceDTO();
+            item.setAuthor(resource.getAuthor());
+            item.setResourceURI(resource.getUri());
+            item.setResourceUID(resource.getUid());
+            resourceDTOS.add(item);
+        }
+        ResourceDTO resourceDTO = new ResourceDTO();
+        resourceDTO.setResourcesList(resourceDTOS);
+        return resourceDTO;
     }
 
     @Override
@@ -595,5 +613,4 @@ public class HazelcastResourceServiceImpl implements ResourceService {
         final byte[] responseData = Files.readAllBytes(responseFile);
         return responseData;
     }
-
 }

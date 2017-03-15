@@ -31,6 +31,7 @@ public interface Constants {
     static String CREATE_RESOURCE = "createResource";
     static String UPDATE_RESOURCE = "updateResource";
     static String QUERY_RESOURCE = "queryResource";
+    static String LIST_ALL_RESOURCES = "listAllResources";
     static String DELETE_RESOURCE = "deleteResource";
     static String GET_DATA = "getData";
     static String GET_MULTIPART_DATA = "getMultiPartData";
@@ -72,7 +73,6 @@ public interface Constants {
     static String RESOURCE_NOT_OWNED = "The supplied resource UID cannot be modified, the lock is held by someone else already";
     static String RESOURCE_NOT_FOUND = "The supplied resource UID does not exist. This is possible if the UID was recently deleted.";
     static String VALIDATION_ERROR = "The supplied resource data are invalid.";
-
 
     static Long MAX_FILE_SIZE_TO_CACHE = (long) (10 * 1024 * 1024);
 }

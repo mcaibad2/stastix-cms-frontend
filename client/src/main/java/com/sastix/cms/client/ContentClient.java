@@ -18,6 +18,7 @@ package com.sastix.cms.client;
 
 import com.sastix.cms.common.api.ContentApi;
 import com.sastix.cms.common.content.DataDTO;
+import com.sastix.cms.common.content.ResourceDTO;
 import com.sastix.cms.common.content.exceptions.ContentValidationException;
 import com.sastix.cms.common.content.exceptions.ResourceAccessError;
 import com.sastix.cms.common.dataobjects.ResponseDTO;

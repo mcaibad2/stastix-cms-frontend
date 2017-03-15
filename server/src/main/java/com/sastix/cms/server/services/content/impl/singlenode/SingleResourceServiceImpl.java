@@ -237,9 +237,9 @@ public class SingleResourceServiceImpl implements ResourceService {
         final ResourceDTO resourceDTO = new ResourceDTO();
         // Get saved resource
         // check if resource has been deleted
-        if(latestRevision.getDeletedAt()!=null) {
+        if (latestRevision.getDeletedAt() != null) {
             throw new ResourceNotFound("The supplied resource UID[" + updateResourceDTO.getResourceUID() + "] does not exist. It has been deleted");
-        }else{
+        } else {
             Resource persistedResource = resourceRepository.findByUidOrderByIdAsc(updateResourceDTO.getResourceUID(), new PageRequest(0, 1)).get(0);
             Resource archivedResource = crs.cloneResource(persistedResource);
             byte[] binaryForUpdate = updateResourceDTO.getResourceBinary();
@@ -325,7 +325,7 @@ public class SingleResourceServiceImpl implements ResourceService {
             }
         }
 
-        LockedResourceDTO ldto=lockStatus.get(resourceDTO.getResourceUID());
+        LockedResourceDTO ldto = lockStatus.get(resourceDTO.getResourceUID());
         final LockedResourceDTO lockedResourceDTO = new LockedResourceDTO();
         lockedResourceDTO.setLockID(ldto.getLockID());
         lockedResourceDTO.setLockExpirationDate(ldto.getLockExpirationDate());
@@ -423,6 +423,24 @@ public class SingleResourceServiceImpl implements ResourceService {
     @Override
     public Resource insertChildResource(CreateResourceDTO createResourceDTO, String parentUid, Resource parentResource) {
         return null;
+    }
+
+    @Override
+    public ResourceDTO listAllResources() {
+        List<ResourceDTO> resourceDTOS = new ArrayList<>();
+        Iterable<Resource> resources = resourceRepository.findAll();
+        Iterator<Resource> iterator = resources.iterator();
+        while (iterator.hasNext()) {
+            Resource resource = iterator.next();
+            ResourceDTO item = new ResourceDTO();
+            item.setAuthor(resource.getAuthor());
+            item.setResourceURI(resource.getUri());
+            item.setResourceUID(resource.getUid());
+            resourceDTOS.add(item);
+        }
+        ResourceDTO resourceDTO = new ResourceDTO();
+        resourceDTO.setResourcesList(resourceDTOS);
+        return  resourceDTO;
     }
 
     @Override

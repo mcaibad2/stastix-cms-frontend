@@ -21,9 +21,6 @@ import com.sastix.cms.client.CacheClient;
 import com.sastix.cms.client.ContentClient;
 import com.sastix.cms.client.LockClient;
 import com.sastix.cms.common.Constants;
-import com.sastix.cms.common.api.CacheApi;
-import com.sastix.cms.common.api.ContentApi;
-import com.sastix.cms.common.api.LockApi;
 import com.sastix.cms.common.cache.CacheDTO;
 import com.sastix.cms.common.cache.QueryCacheDTO;
 import com.sastix.cms.common.cache.RemoveCacheDTO;
@@ -58,15 +55,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CmsClient implements ContentClient, LockClient, CacheClient, BeanFactoryAware {
@@ -180,11 +177,19 @@ public class CmsClient implements ContentClient, LockClient, CacheClient, BeanFa
         return retryRestTemplate.postForObject(url, dataDTO, byte[].class);
     }
 
+    public Iterable<ResourceDTO> listAllResources(ResourceQueryDTO resourceQueryDTO) {
+        String url = apiVersionClient.getApiUrl() + "/" + Constants.LIST_ALL_RESOURCES;
+        LOG.trace("API call: " + url);
+        ResourceDTO resourceDTO = retryRestTemplate.postForObject(url, resourceQueryDTO, ResourceDTO.class);
+        List<ResourceDTO> resourceDTOS = resourceDTO.getResourcesList();
+        LOG.trace("Response: {}", resourceDTOS);
+        return resourceDTOS;
+    }
+
     @Override
     public ResponseDTO getDataStream(DataDTO dataDTO) throws ResourceAccessError, ContentValidationException, IOException {
         return getData(dataDTO.getResourceURI());
     }
-
 
     @Override
     public ResponseDTO getData(final String uri) throws IOException {
@@ -200,17 +205,11 @@ public class CmsClient implements ContentClient, LockClient, CacheClient, BeanFa
     @Override
     public ResponseDTO getMultiPartData(final String uri, final Map<String, List<String>> reqHeaders) throws IOException {
         final String url = apiVersionClient.getApiUrl() + "/" + Constants.GET_MULTIPART_DATA + "/" + uri;
-
         final HttpHeaders headers = new HttpHeaders();
         headers.putAll(reqHeaders);
-
         final HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-
-        final ResponseEntity<byte[]> responseEntity
-                = retryRestTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
-
+        final ResponseEntity<byte[]> responseEntity = retryRestTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
         final Integer httpStatus = responseEntity.getStatusCode().value();
-
         return new ResponseDTO(responseEntity.getBody(), responseEntity.getHeaders().toSingleValueMap(), httpStatus);
     }
 
@@ -297,15 +296,11 @@ public class CmsClient implements ContentClient, LockClient, CacheClient, BeanFa
                     }
                 }
             }
-
             StringBuffer url = new StringBuffer(getUrlRoot()).append(Constants.GET_CACHE);
             LOG.debug("API call: " + url);
             LOG.debug("Request DTO: " + queryCacheDTO.toString());
-
             cacheDTO = retryRestTemplate.postForObject(url.toString(), queryCacheDTO, CacheDTO.class);
-
             LOG.debug("Response DTO: {}", cacheDTO);
-
         }
         return cacheDTO;
     }
@@ -315,8 +310,9 @@ public class CmsClient implements ContentClient, LockClient, CacheClient, BeanFa
         nullValidationChecker(removeCacheDTO, RemoveCacheDTO.class);
         StringBuffer url = new StringBuffer(getUrlRoot()).append(Constants.CLEAR_CACHE_REGION);
         LOG.debug("API call: " + url);
-        if (removeCacheDTO != null)
+        if (removeCacheDTO != null) {
             LOG.debug("Request DTO: " + removeCacheDTO.toString());
+        }
         retryRestTemplate.postForObject(url.toString(), removeCacheDTO, RemoveCacheDTO.class);
     }
 

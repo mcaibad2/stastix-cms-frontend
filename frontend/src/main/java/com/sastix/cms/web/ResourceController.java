@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Controller
 public class ResourceController {
@@ -35,14 +34,8 @@ public class ResourceController {
 
     @RequestMapping(value = "/resources", method = RequestMethod.GET)
     public String listResources(Model model) {
-
         ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
-        resourceQueryDTO.setQueryResourceAuthor("Andreas Daskalopoulos");
-        resourceQueryDTO.setQueryUID("");
-        ResourceDTO resourceDTO = cmsClient.queryResource(resourceQueryDTO);
-
-        List<ResourceDTO> resourceDTOS = resourceDTO.getResourcesList();
-        model.addAttribute("resources", resourceDTO.getResourcesList());
+        model.addAttribute("resources", cmsClient.listAllResources(resourceQueryDTO));
         System.out.println("Returning resources:");
         return "resources";
     }
