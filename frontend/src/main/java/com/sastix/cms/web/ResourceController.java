@@ -50,8 +50,10 @@ public class ResourceController {
         ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
         resourceQueryDTO.setQueryUID(uid);
         ResourceDTO resourceDTO = cmsClient.queryResource(resourceQueryDTO);
+
         LockedResourceDTO lockedResourceDTO = cmsClient.lockResource(resourceDTO);
-        cmsClient.deleteResource(lockedResourceDTO);
+
+        ResourceDTO resourceDTO1 = cmsClient.deleteResource(lockedResourceDTO);
         return "redirect:/resources";
     }
 
