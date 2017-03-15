@@ -1,9 +1,9 @@
 package com.sastix.cms.web;
 
 import com.sastix.cms.client.impl.CmsClient;
-import com.sastix.cms.common.content.CreateResourceDTO;
-import com.sastix.cms.common.content.ResourceDTO;
-import com.sastix.cms.common.content.ResourceQueryDTO;
+import com.sastix.cms.common.cache.QueryCacheDTO;
+import com.sastix.cms.common.cache.RemoveCacheDTO;
+import com.sastix.cms.common.content.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,15 +23,6 @@ public class ResourceController {
     @Autowired
     private CmsClient cmsClient;
 
-    @RequestMapping("resource/{uid}")
-    public String showResource(@PathVariable String uid, Model model) {
-        ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
-        resourceQueryDTO.setQueryUID(uid);
-        ResourceDTO resourceDTO = cmsClient.queryResource(resourceQueryDTO);
-        model.addAttribute("resource", resourceDTO);
-        return "resourceshow";
-    }
-
     @RequestMapping(value = "/resources", method = RequestMethod.GET)
     public String listResources(Model model) {
         ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
@@ -40,10 +31,37 @@ public class ResourceController {
         return "resources";
     }
 
+    @RequestMapping(value = "resource/{uid}", method = RequestMethod.GET)
+    public String showResource(@PathVariable String uid, Model model) {
+        ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
+        resourceQueryDTO.setQueryUID(uid);
+        model.addAttribute("resource", cmsClient.queryResource(resourceQueryDTO));
+        return "resourceshow";
+    }
+
     @RequestMapping("resources/new")
     public String newResource(Model model) {
         model.addAttribute("resource", new CreateResourceDTO());
         return "resourceform";
+    }
+
+    @RequestMapping("resource/delete/{uid}")
+    public String deleteResource(@PathVariable String uid) {
+        ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
+        resourceQueryDTO.setQueryUID(uid);
+        ResourceDTO resourceDTO = cmsClient.queryResource(resourceQueryDTO);
+        LockedResourceDTO lockedResourceDTO = cmsClient.lockResource(resourceDTO);
+        cmsClient.deleteResource(lockedResourceDTO);
+        return "redirect:/resources";
+    }
+
+    @RequestMapping("resource/edit/{uid}")
+    public String edit(@PathVariable String uid, Model model) {
+        ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
+        resourceQueryDTO.setQueryUID(uid);
+        ResourceDTO resourceDTO = cmsClient.queryResource(resourceQueryDTO);
+        model.addAttribute("resource", resourceDTO);
+        return "resourceedit";
     }
 
     @RequestMapping(value = "resource", method = RequestMethod.POST)
@@ -60,5 +78,18 @@ public class ResourceController {
         }
         ResourceDTO resourceDTO = cmsClient.createResource(createResourceDTO);
         return "redirect:/resource/" + resourceDTO.getResourceUID();
+    }
+
+    @RequestMapping(value = "editResource", method = RequestMethod.POST)
+    public String editResource(ResourceDTO resourceDTO) {
+        UpdateResourceDTO updateResourceDTO = new UpdateResourceDTO();
+        updateResourceDTO.setResourceUID(resourceDTO.getResourceUID());
+        updateResourceDTO.setAuthor(resourceDTO.getAuthor());
+//        updateResourceDTO.setResourceName();
+//        updateResourceDTO.setLockExpirationDate();
+//        updateResourceDTO.setLockID();
+        LockedResourceDTO lockedResourceDTO = cmsClient.updateResource(updateResourceDTO);
+
+        return "redirect:/resource/" + lockedResourceDTO.getResourceUID();
     }
 }

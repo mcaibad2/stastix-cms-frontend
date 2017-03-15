@@ -23,6 +23,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -33,15 +34,14 @@ public interface ResourceRepository extends CrudRepository<Resource, Integer> {
 
     @Query("SELECT r FROM Resource r WHERE r.uid = :uid")
     List<Resource> findByUID(@Param("uid") String uid);
-    
+
     @Modifying
     @Query("update Resource res set res.author = :author where res.id = :id")
     Integer updateAuthor(@Param("id") int id, @Param("author") String author);
 
-
     Resource findOneByUid(@Param("uid") String uid);
 
     List<Resource> findByUidOrderByIdDesc(@Param("uid") String uid, Pageable pageable);
-    List<Resource> findByUidOrderByIdAsc(@Param("uid") String uid, Pageable pageable);
 
+    List<Resource> findByUidOrderByIdAsc(@Param("uid") String uid, Pageable pageable);
 }
