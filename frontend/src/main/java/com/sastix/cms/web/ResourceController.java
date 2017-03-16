@@ -1,8 +1,6 @@
 package com.sastix.cms.web;
 
 import com.sastix.cms.client.impl.CmsClient;
-import com.sastix.cms.common.cache.QueryCacheDTO;
-import com.sastix.cms.common.cache.RemoveCacheDTO;
 import com.sastix.cms.common.content.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +23,7 @@ public class ResourceController {
 
     @RequestMapping(value = "/resources", method = RequestMethod.GET)
     public String listResources(Model model) {
+        cmsClient.clearCache();
         ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
         model.addAttribute("resources", cmsClient.listAllResources(resourceQueryDTO));
         System.out.println("Returning resources:");
@@ -53,7 +52,7 @@ public class ResourceController {
 
         LockedResourceDTO lockedResourceDTO = cmsClient.lockResource(resourceDTO);
 
-        ResourceDTO resourceDTO1 = cmsClient.deleteResource(lockedResourceDTO);
+        cmsClient.deleteResource(lockedResourceDTO);
         return "redirect:/resources";
     }
 
